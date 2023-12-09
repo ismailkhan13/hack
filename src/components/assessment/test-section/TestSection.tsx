@@ -132,7 +132,8 @@ const TestSection = (props: IProps) => {
     }
 
     return (
-        <section className='test-section tw-bg-white tw-rounded-[24px] tw-p-2 md:tw-px-16 md:tw-pb-16 md:pt-6'>
+        <section className='test-section tw-bg-[#1E1E1E] tw-rounded-[24px] tw-p-2 md:tw-px-16 md:tw-pb-16 md:pt-6'>
+            <p className='section-heading'>Assessment</p>
             <div className='question tw-flex tw-items-center tw-gap-4 fs14 tw-font-semibold'>Question {getQuestionNumber()}/{questionDetails?.totalQuestion || 0}
                 {
                     questionDetails?.question?.additional_info ? (
@@ -150,8 +151,6 @@ const TestSection = (props: IProps) => {
             </div>
             <div className='tw-flex tw-items-center tw-justify-between '>
                 <div className='text tw-font-bold' dangerouslySetInnerHTML={{ __html: purify.sanitize(questionDetails?.question?.question || "") }}></div>
-
-
             </div>
             {questionDetails?.question?.question_image &&
                 <img

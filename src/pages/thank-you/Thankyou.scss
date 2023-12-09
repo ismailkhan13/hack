@@ -3,10 +3,9 @@
 .activities-completed-container {}
 
 .completed-activities {
-    @extend .primary-background;
-    background-color: #fff;
+    background-color: #2C2C2C;
     border-radius: 20px;
-    min-height: 90vh;
+    min-height: 80vh;
     padding-top: 4rem;
     display: flex;
     justify-content: center;

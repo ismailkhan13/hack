@@ -19,10 +19,10 @@ const Thankyou = () => {
                 <h1 className="completed-h1 tw-text-center">
                     Thank you for completing your Survey
                 </h1>
-              
-                <Link to={'/mySessions'} className="btn btn--blue bt-xl book-session">
-                    Book Your  Session
-                </Link>
+
+                {/* <Link to={'/'} className="btn btn--blue bt-xl book-session">
+                    Home
+                </Link> */}
             </div>
         </div>
     )

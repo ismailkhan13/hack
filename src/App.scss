@@ -16,17 +16,15 @@
 }
 
 .App {
+    background-color: #1E1E1E;
+    border-radius: 30px;
+    margin: 2rem ;
+    min-height: 100vh;
+    // padding: 1rem 6rem;
+    color: #fff;
 
-    .page-container {
-        background-color: #f3f6f7;
-        border-radius: 30px;
-        margin: 3.35rem 2.25rem 0;
-        min-height: 100vh;
-        padding: 1rem 6rem;
-
-        @include respond(phone) {
-            padding: 1rem;
-            margin: 0px;
-        }
+    @include respond(phone) {
+        padding: 1rem;
+        margin: 0px;
     }
 }

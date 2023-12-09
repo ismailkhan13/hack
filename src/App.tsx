@@ -10,9 +10,6 @@ import Survey from './pages/survey/Survey';
 import Thankyou from './pages/thank-you/Thankyou';
 
 function App() {
-
-  const pathName = window.location.pathname
-  console.log(pathName)
   return (
     <div className="App">
       <div className='routes-container'>
@@ -23,26 +20,27 @@ function App() {
             </React.Suspense>
           } >
           </Route>
+          <Route path={'/assessment'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Assessment />
+            </React.Suspense>
+          } ></Route>
+          <Route path={'/survey'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Survey />
+            </React.Suspense>
+          } ></Route>
+          <Route path={'/survey'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Survey />
+            </React.Suspense>
+          } ></Route>
+          <Route path={'/thankyou'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Thankyou />
+            </React.Suspense>
+          } ></Route>
         </Routes>
-        <div className={pathName == '/' ? '' : 'page-container'}>
-          <Routes>
-            <Route path={'/assessment'} element={
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <Assessment />
-              </React.Suspense>
-            } ></Route>
-            <Route path={'/survey'} element={
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <Survey />
-              </React.Suspense>
-            } ></Route>
-            <Route path={'/thankyou'} element={
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <Thankyou />
-              </React.Suspense>
-            } ></Route>
-          </Routes>
-        </div>
       </div>
 
 

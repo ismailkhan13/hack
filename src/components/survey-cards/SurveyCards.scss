@@ -1,5 +1,5 @@
 .survey-card {
-    background: #fff;
+    background: #2C2C2C;
     border: 1px solid rgba(17, 13, 63, .08);
     border-radius: 16px;
     box-shadow: 0 14px 50px -20px rgba(8, 17, 49, .07);
@@ -7,9 +7,10 @@
     padding: 1rem;
     min-width: 270px;
     position: relative;
+    border: 1px solid #444444;
 
     .survey-heading {
-        color: #0a2c3f;
+        color: #fff;
         font-size: 18px;
         font-weight: 700;
     }
