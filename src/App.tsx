@@ -6,6 +6,7 @@ import OnboardingPage from './pages/onboarding/OnboardingPage';
 import Assessment from './pages/assessment/Assessment';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ConnectAccount from './pages/connect-account/ConnectAccount';
 
 function App() {
   return (
@@ -21,6 +22,12 @@ function App() {
           <Route path={'/'} element={
             <React.Suspense fallback={<div>Loading...</div>}>
               <OnboardingPage />
+            </React.Suspense>
+          } >
+          </Route>
+          <Route path={'/connectMask'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <ConnectAccount />
             </React.Suspense>
           } >
           </Route>
