@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Survey from './pages/survey/Survey';
 import Thankyou from './pages/thank-you/Thankyou';
+import ConnectAccount from './pages/connect-account/ConnectAccount';
 
 function App() {
   return (
@@ -40,6 +41,12 @@ function App() {
               <Thankyou />
             </React.Suspense>
           } ></Route>
+          <Route path={'/connectMask'} element={
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <ConnectAccount />
+            </React.Suspense>
+          } >
+          </Route>
         </Routes>
       </div>
 
