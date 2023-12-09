@@ -267,7 +267,6 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 						</div>
 						<div className='tw-font-medium tw-text-sm primary-text-1'>1/3</div>
 					</div>
-					<LeftBanner />
 					<div className='right-section tw-w-full md:tw-w-1/2 md:tw-p-4 tw-px-4 tw-pt-0 tw-pb-4'>
 						<a href={process.env.REACT_APP_MINDLER_LOGIN_URL} className='tw-flex tw-justify-start md:tw-justify-end md:tw-w-full md:tw-ml-6 tw-my-4'>
 							<img className='tw-w-40 md:tw-mr-8' src={`${imageBaseUrl}/onboarding/mindlerIcon.svg`} alt='' />
