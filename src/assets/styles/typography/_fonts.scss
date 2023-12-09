@@ -1,0 +1,147 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap");
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-Regular'),
+        url('../../fonts/HKGrotesk-Regular.otf') format('woff'),
+        url('../../fonts/HKGrotesk-Regular.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-Regular.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-Regular.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-Regular.otf') format('svg');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-Medium'),
+        url('../../fonts/HKGrotesk-Medium.otf') format('woff'),
+        url('../../fonts/HKGrotesk-Medium.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-Medium.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-Medium.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-Medium.otf') format('svg');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-Bold'),
+        url('../../fonts/HKGrotesk-Bold.otf') format('woff'),
+        url('../../fonts/HKGrotesk-Bold.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-Bold.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-Bold.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-Bold.otf') format('svg');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-SemiBold'),
+        url('../../fonts/HKGrotesk-SemiBold.otf') format('woff'),
+        url('../../fonts/HKGrotesk-SemiBold.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-SemiBold.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-SemiBold.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-SemiBold.otf') format('svg');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-ExtraBold'),
+        url('../../fonts/HKGrotesk-ExtraBold.otf') format('woff'),
+        url('../../fonts/HKGrotesk-ExtraBold.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-ExtraBold.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-ExtraBold.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-ExtraBold.otf') format('svg');
+    font-weight: 800;
+}
+
+@font-face {
+    font-family: 'mindler-font';
+    src: local('HKGrotesk-Light'),
+        url('../../fonts/HKGrotesk-Light.otf') format('woff'),
+        url('../../fonts/HKGrotesk-Light.otf') format('woff2'),
+        url('../../fonts/HKGrotesk-Light.otf') format('embedded-opentype'),
+        url('../../fonts/HKGrotesk-Light.otf') format('truetype'),
+        url('../../fonts/HKGrotesk-Light.otf') format('svg');
+    font-weight: 300;
+}
+
+body {
+    font-size: 14px;
+    font-family: 'mindler-font', 'Open Sans';
+
+    &.dark {
+        font-weight: 350;
+
+        img {
+            filter: brightness(0.8) contrast(1.2);
+        }
+
+        background-color: #16151A;
+        color: rgba(173, 173, 173, 0.75);
+
+        .primary-text-75 {
+            color: rgba(173, 173, 173, 0.75);
+        }
+
+        .primary-text-1 {
+            color: #ffffff;
+        }
+
+        .primary-text-45 {
+            color: rgba(173, 173, 173, 0.45);
+        }
+
+        .primary-background {
+            // background-color: #16151A;
+            background-color: #000000;
+
+        }
+
+        .secondary-background {
+            // background-color: #000000;
+            background-color: #16151A;
+        }
+
+        .primary-border {
+            border: 1px solid rgba(59, 59, 59, 1);
+        }
+    }
+
+    &.light {
+        background-color: #ffffff;
+        color: rgba(10, 44, 63, 0.75);
+
+        .primary-text-75 {
+            color: rgba(10, 44, 63, 0.75);
+        }
+
+        .primary-text-1 {
+            color: rgba(10, 44, 63, 1);
+        }
+
+        .primary-text-45 {
+            color: rgba(10, 44, 63, 0.45);
+        }
+
+        .primary-background {
+            background-color: #ffffff;
+        }
+
+        .secondary-background {
+            background-color: #f7f7f7;
+        }
+
+        .primary-border {
+            border: 1px solid rgba(17, 13, 63, .08);
+        }
+    }
+
+    @include respond(phone) {
+        font-size: 13px;
+    }
+}
+
+.fs-13 {
+    font-size: 13px;
+}

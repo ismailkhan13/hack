@@ -1,0 +1,123 @@
+@import "/src/assets/styles/abstracts/variables";
+
+.test-section {
+    td {
+        border: solid 2px lightgrey;
+        padding: 0.25rem;
+        white-space: nowrap;
+    }
+
+    .question {
+        color: #0083B3;
+
+        &-image {
+            background-color: #fff;
+            max-width: 36rem;
+            max-height: 12rem;
+
+            &--big {
+                max-width: 44rem;
+                max-height: 24rem;
+            }
+
+            @include respond(phone) {
+                max-width: 18rem;
+            }
+
+            img {
+                width: 100%;
+            }
+        }
+    }
+
+    .text {
+        @extend .primary-text-1;
+    }
+
+    .option {
+        background-color: #fff;
+
+        .tick {
+            display: none;
+        }
+
+        &-radio {
+            display: none;
+
+            &:checked+label {
+                background-color: $color-primary;
+                color: #fff;
+
+
+
+                .icon__container {
+                    display: block;
+                    color: #fff;
+
+
+                }
+
+                .tick {
+                    display: block;
+                }
+            }
+        }
+
+        @extend .primary-background;
+        @extend .primary-border;
+        ;
+        box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.06);
+        border-radius: 12px;
+        cursor: pointer;
+        @extend .primary-text-1;
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+
+        &__img {
+            background-color: #fff !important;
+            display: block;
+            width: 8rem;
+        }
+    }
+
+}
+
+.pause-exit-popup {
+    border-radius: 1rem;
+    width: 50%;
+    @extend .primary-background;
+
+    @include respond(phone) {
+        width: 90%;
+    }
+
+    .button1 {
+        width: 183px;
+        height: 48px;
+        @extend .primary-background;
+        @extend .primary-border;
+
+
+        border: 1px solid rgba(10, 44, 63, 0.4);
+        border-radius: 8px;
+    }
+
+    .button2 {
+        width: 183px;
+        height: 48px;
+        background: #1480B7;
+        box-shadow: 0px 3px 0px #0F5F87;
+        border-radius: 8px;
+
+        .res {
+            color: #FFFFFF;
+            text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+        }
+    }
+}
+
+.big-radio {
+    width: 1.25rem;
+    cursor: pointer;
+}

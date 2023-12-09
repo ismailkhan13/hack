@@ -1,0 +1,35 @@
+@import "/src/assets/styles/abstracts/variables";
+
+
+
+.form-label-1 {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 18px;
+    display: block;
+    color: rgba($color-secondary, 0.75);
+    margin-bottom: 8px;
+}
+
+.form-control-1 {
+    background: #FFFFFF;
+    @extend .primary-border;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 18px;
+    color: #0A2C3F;
+    box-sizing: border-box;
+    width: 100%;
+    display: block;
+    min-height: 48px;
+    padding: 12px;
+
+}
+
+
+.form-row {
+    &+.form-row {
+        margin-top: 24px;
+    }
+}

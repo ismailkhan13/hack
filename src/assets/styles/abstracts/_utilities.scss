@@ -1,0 +1,184 @@
+@import "/src/assets/styles/abstracts/variables";
+
+.validation-msg {
+    color: red !important;
+    font-size: 12px;
+}
+
+.section-heading {
+    font-size: 24px;
+    @extend .primary-text-1;
+    font-weight: 700;
+
+    @include respond(phone) {
+        font-size: 18px;
+    }
+
+    &.mob-heading {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 26px;
+        @extend .primary-text-1;
+
+        .mob-back-btn {
+            display: none;
+
+            @include respond(phone) {
+                display: block;
+            }
+        }
+    }
+
+}
+
+.section-lg-heading {
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 52px;
+    @extend .primary-text-1;
+}
+
+.fs14 {
+    font-size: 14px;
+}
+
+.fs13 {
+    font-size: 13px;
+}
+
+.fs17 {
+    font-size: 17px;
+}
+
+.fs18 {
+    font-size: 18px;
+}
+
+.fs15 {
+    font-size: 15px;
+}
+
+.fs11 {
+    font-size: 11px;
+}
+
+.fs20 {
+    font-size: 20px;
+
+    @include respond(phone) {
+        font-size: 18px;
+    }
+}
+
+
+.fs32 {
+    font-size: 32px;
+
+    @include respond(phone) {
+        font-size: 24px;
+    }
+}
+
+.fs40 {
+    font-size: 40px;
+
+    @include respond(phone) {
+        font-size: 30px;
+    }
+}
+
+.fs42 {
+    font-size: 42px;
+
+    @include respond(phone) {
+        font-size: 32px;
+    }
+}
+
+.back {
+    @extend .primary-background;
+    cursor: pointer;
+
+    @media screen and (min-width:769px) {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media screen and (max-width:768px) {
+        display: none;
+
+    }
+}
+
+.bbt {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(10, 44, 63, 0.15);
+}
+
+.custom-file-input::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.custom-file-input::before {
+    content: 'Choose File';
+    display: inline-block;
+    background: #1480B7;
+    color: #fff;
+
+    &:hover {
+        filter: brightness(95%);
+    }
+
+    padding: 12px 14px;
+    border-radius: 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.section-container {
+    box-shadow: 0px 44px 60px -20px rgba(8, 17, 49, 0.08);
+    border-radius: 20px;
+    @extend .primary-border;
+    @extend .primary-background;
+
+    @include respond(phone) {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+}
+
+.profile-img {
+    border: 5px solid #FFFFFF;
+    box-shadow: 0px 4px 11px rgba(0, 0, 0, 0.1);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+}
+
+.otp-input-container {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-between;
+
+    div {
+        width: 4rem;
+        height: 4rem;
+    }
+}
+
+.otp-input-box {
+    border: 1px solid #cecece;
+    border-radius: 10px;
+    width: 100% !important;
+    height: 100% !important;
+}

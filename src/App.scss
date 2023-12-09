@@ -1,0 +1,15 @@
+@import "/src/assets/styles/abstracts/variables";
+.theme-toast{
+    @extend .primary-background;
+    @extend .primary-text-1;
+    @extend .primary-border;
+}
+
+.react-tel-input .form-control{
+    @extend .primary-background;
+}
+
+.pwa-update-screen{
+    padding: 3rem;
+    text-align: center;
+}

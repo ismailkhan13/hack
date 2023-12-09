@@ -1,0 +1,12 @@
+.onboarding-mobile-tabs {
+    .lines {
+        height: 3px;
+        margin: 4px;
+        background-color: #cecece;
+        flex: 1 0 31%;
+        border-radius: 1px;
+        &--active {
+            background-color: #1480B7;
+        }
+    }
+}
