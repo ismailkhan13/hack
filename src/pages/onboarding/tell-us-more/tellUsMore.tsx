@@ -53,18 +53,15 @@ interface formType {
 	school_id: number | null,
 	school_branch_id: number | null,
 	school_type_id: number | null,
-
+	email: string
 }
 
 const validationSchema = yup.object().shape({
 	name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters').max(50).matches(VALIDATION_REGEX_PATTERN.names, "Special characters and numbers are not allowed"),
-	city_id: yup.object({ city_name: yup.string(), city_id: yup.number(), state_name: yup.string(), state_id: yup.number(), country_name: yup.string(), country_id: yup.number(), }).required('City is required').nullable(),//for number fields null and "" is acceptable
-	country_id: yup.number().required('Country is required').nullable().typeError(''),
-	state_id: yup.number().required('State is required').nullable().typeError(''),
+	email: yup.string().required('Email is required').min(2, 'Email must be at least 2 characters').max(50).matches(VALIDATION_REGEX_PATTERN.emailPattern, "Email is  not valid"),
 	phone_no: yup.string().required('Phone number is required').matches(VALIDATION_REGEX_PATTERN.mobile, 'Invalid Phone Number'),
 	phone_country_code: yup.string(),
 	password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters').max(12, 'Password must be at most 12 characters'),
-	otp: yup.string().required("Otp is  Required").min(5).max(5)
 });
 
 const schoolNameData = [{ id: 1, school_name: 'Prakriti School' }, { id: 2, school_name: 'Kaushalya World School' }];
@@ -106,6 +103,7 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 
 	const formDefaultValues: formType = {
 		name: '',
+		email: '',
 		city_id: null,
 		country_id: null,
 		state_id: null,
@@ -232,112 +230,11 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 		}
 	};
 
-	//function to get otp for signup
-	const getOtp = async () => {
-		if (otpButtonClicked) {
-			return;
-		}
 
-		setOtpButtonClicked(true);
-		let phone_no = getValues('phone_no');
-		let phone_country_code = getValues('phone_country_code');
-		let otpRes: IAPIResponse = await httpService(MODULES_API_MAP.AUTHENTICATION, GLOBAL_API_ROUTES.GET_SIGNUP_OTP, false, true, { key: getDataFromLocalStorage(LOCAL_STORAGE_DATA_KEYS.TEMPORARY_ONBOARDING_KEY) }).POST(
-			{ phone_no: phone_no.slice(phone_country_code.length - 1), phone_country_code })
-			.catch((err) => {
-				toast.error(err?.response.data.errors[0]?.message);
-				setOtpButtonClicked(false);
-			})
-		if (otpRes && otpRes?.success) {
-			setOtpSent(true);
-			toast.success('Otp Sent Successfully');
-			setResendTimer();
-			firstOtpClick.current = true;
-		} else if (otpRes) {
-			toast.error(otpRes.message);
-			setOtpButtonClicked(false);
-		}
-	}
 
-	//function to keep a timer to limit otp calls, enables otp sending every 30 secs 
-	const setResendTimer = () => {
-		let total_time = 30;
-		setOtpTimer(total_time);
-		let interval = setInterval(() => {
-			total_time--;
-			setOtpTimer(total_time);
-			if (total_time <= 0) {
-				clearInterval(interval);
-				setOtpButtonClicked(false);
-			}
-		}, 1000)
-	}
 
 	const arrowBack = () => {
 		navigate('/onboarding');
-	}
-
-	const onOtpInput = async (otp: any) => {
-		if (otp && otp?.length == 5) {
-			let res = await httpService(MODULES_API_MAP.AUTHENTICATION, '/verifyOnboardingOtp', true, true, { key: getDataFromLocalStorage(LOCAL_STORAGE_DATA_KEYS.TEMPORARY_ONBOARDING_KEY) }).POST({ otp })
-			if (res?.success) {
-				toast.success('OTP Verified Successfully!')
-				setIsOtpVerified(true);
-			}
-		}
-	}
-
-	const onEmailEdit = () => {
-
-		setEmailVerified(false);
-		setValue('phone_no', '+91');
-		setValue('otp', '');
-		setIsOtpVerified(false);
-
-		setEmailEditable(true);
-	}
-
-
-	const submitSignupEmail = async (email: string = emailInput) => {
-		if (!VALIDATION_REGEX_PATTERN.emailPattern.test(email)) {
-			toast.error('Email not valid');
-			setEmailEditable(true);
-			return;
-		}
-
-
-		let lead_data = getDataFromLocalStorage('lead_data');
-		let lead_parsed: any = {};
-		try {
-			lead_parsed = JSON.parse(lead_data);
-		} catch (err) {
-
-		}
-		let signupRes: IAPIResponse = await httpService(MODULES_API_MAP.AUTHENTICATION, GLOBAL_API_ROUTES.SIGN_UP, false, true, { key: getDataFromLocalStorage(LOCAL_STORAGE_DATA_KEYS.TEMPORARY_ONBOARDING_KEY) }).POST({ email: email, ip_adress: "", ...lead_parsed?.data })
-			.catch((err) => {
-				toast.error('Error Occurred, Please try Later');
-				setEmailVerified(false);
-				setEmailEditable(true);
-			})
-
-		if (signupRes.success) {
-			setEmailVerified(true);
-			setEmailEditable(false);
-			let temp_session = signupRes.data?.tempSessionDetails?.session;
-			let temp_data = signupRes.data;
-			if (temp_session) {
-				setDataOnLocalStorage(LOCAL_STORAGE_DATA_KEYS.TEMPORARY_ONBOARDING_KEY, temp_session);
-				setDataOnLocalStorage(LOCAL_STORAGE_DATA_KEYS.TEMPORARY_ONBOARDING_DATA, JSON.stringify(temp_data));
-				checkTemporaryLoginDetailsFn()
-			}
-
-
-		} else {
-			toast.error(signupRes.message);
-			// signupForm.setError('email', { message: signupRes.message, type: 'custom' })
-			setEmailVerified(false);
-			setEmailEditable(true);
-		}
-
 	}
 
 	const onEmailChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -361,10 +258,7 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 
 	return (
 		<>
-			{/* onboarding tell us about your self page */}
 			<form onSubmit={handleSubmit(onSubmit)}>
-				{/* <button onClick={() => {
-				updateActiveStep(3)}}>step 3</button> */}
 				<div className='complete-signup-page tw-flex tw-justify-items-center tw-flex-wrap md:tw-flex-nowrap md:tw-gap-8'>
 					<div className='tw-flex tw-justify-between md:tw-hidden tw-items-center tw-w-full md:tw-p-3 tw-px-3 tw-pt-3 tw-pb-0'>
 						<div className='tw-flex tw-gap-4'>
@@ -373,7 +267,6 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 						</div>
 						<div className='tw-font-medium tw-text-sm primary-text-1'>1/3</div>
 					</div>
-					<MobileTabs index={currentActiveStep} />
 					<LeftBanner />
 					<div className='right-section tw-w-full md:tw-w-1/2 md:tw-p-4 tw-px-4 tw-pt-0 tw-pb-4'>
 						<a href={process.env.REACT_APP_MINDLER_LOGIN_URL} className='tw-flex tw-justify-start md:tw-justify-end md:tw-w-full md:tw-ml-6 tw-my-4'>
@@ -386,20 +279,14 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 							<div className='tw-flex tw-mb-3 tw-w-full'>
 								<div className='primary-text-1 tw-text-sm tw-font-medium tw-flex tw-w-full'>
 									{
-										!emailEditable ?
-											<div>
-												<p>{onboardingUserDetails?.email} <span className='edit-btn tw-text-center tw-cursor-pointer' onClick={onEmailEdit}>Edit</span></p>
+
+										<FormControl sx={{ width: '100%' }}>
+											<div className='tw-relative tw-w-full'>
+												<label className='primary-text-75 tw-font-medium fs14'>Email</label>
+												<OutlinedInput sx={{ background: 'white' }} {...register('email')} placeholder="Enter Email" className='primary-text-1 tw-font-semibold tw-text-sm tw-w-full' />
+												<p className='validation-msg'>{errors?.email?.message}</p>
 											</div>
-											:
-											<FormControl sx={{ width: '100%' }}>
-												<div className='tw-relative tw-w-full'>
-
-													<div className={`message-prompt ${emailVerified ? 'tw-hidden' : ''}`}>Please enter and confirm your email, to proceed further onboarding</div>
-
-													<OutlinedInput value={emailInput} onChange={(e) => { onEmailChange(e) }} placeholder="Enter Email" className='primary-text-1 tw-font-semibold tw-text-sm tw-w-full' />
-													<button className='tw-absolute btn btn--sky tw-right-1 tw-top-1' type='button' onClick={() => { submitSignupEmail() }}>Confirm</button>
-												</div>
-											</FormControl>
+										</FormControl>
 									}
 								</div>
 								{/* <div className='edit tw-ml-2 tw-px-2'>
@@ -409,7 +296,7 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 							<div>
 								<FormControl sx={{ width: '100%' }}>
 									<label className='primary-text-75 tw-font-medium fs14'>My Name Is</label>
-									<OutlinedInput disabled={!emailVerified}
+									<OutlinedInput sx={{ background: 'white', }}
 										{...register("name")} placeholder="Enter name" className='primary-text-1 tw-font-semibold tw-text-sm tw-w-full' />
 									<p className='validation-msg'>{errors?.name?.message}
 									</p>
@@ -428,7 +315,7 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 											}) => (
 												<FormControl sx={{ width: '100%' }}>
 													<PhoneInput
-														disabled={isOtpVerified || !emailVerified}
+														// sx={{ background: 'white' }}
 														value={value}
 														specialLabel={''}
 														country={'in'}
@@ -457,96 +344,20 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 										}
 									/>
 
-									{isOtpVerified ? <button type='button' className='btn otp--verified'><CheckCircleOutlineIcon sx={{ 'color': 'green' }} /></button> :
-										<button disabled={otpButtonClicked || !showOtp} onClick={() => { getOtp() }} type='button' className='otp--send tw-text-sm tw-font-medium tw-cursor-pointer'>
-											{firstOtpClick.current ? 'Resend OTP' : 'Send OTP'}
-										</button>
-									}
 
 								</div>
 								<p className='validation-msg'>
 									{getFieldState('phone_no').error?.message}
 								</p>
 							</div>
-
-							{(showOtp && otpSent && !isOtpVerified) &&
-								<>
-									<label className='tw-text-sm enter-otp'>Enter OTP</label>
-									<Controller
-										name="otp"
-										control={control}
-										render={({
-											field: { onChange, onBlur, value, name, ref },
-											fieldState: { invalid, isTouched, isDirty, error },
-										}) => (
-											<OtpInput containerStyle={'otp-input-container'} inputStyle={'otp-input-box'}
-												value={value} onChange={(e: string) => { onChange(e); onOtpInput(e); }}
-												separator={''} numInputs={5} isInputNum={true} />
-										)}
-									/>
-								</>
-							}
-							{showOtp && <p className='validation-msg'>
-								{/* {(isSubmitted) && getFieldState('otp').error?.type === 'custom' && getFieldState('otp').error?.message}
-								{(getFieldState('otp').isTouched) && getFieldState('otp').error?.message} */}
-								{getFieldState('otp').error?.message}
-							</p>}
-							{(otpTimer > 0 && !isOtpVerified) && <div className='tw-flex tw-justify-end tw-my-2 resend'>Resend OTP in 00:{otpTimer}</div>}
-
-
-
-							<div className='tw-mb-3'>
-								<div>
-									<div className='tw-font-medium tw-text-sm'>City</div>
-									<Controller
-										name='city_id'
-										control={control}
-										render={({
-											field: { onChange, onBlur, value, name, ref },
-											fieldState: { invalid, isTouched, isDirty, error },
-										}) => (
-											<FormControl sx={{ width: '100%' }}>
-												<Autocomplete
-													disablePortal id="combo-box-demo"
-													disabled={!emailVerified}
-													getOptionLabel={(option) => option.city_name + ", " + option.state_name + ", " + option.country_name}
-													filterOptions={(x) => x}
-													onInput={(event: any) => { getCities(event.target.value) }}
-													onChange={(e, value) => {
-														onChange(value);
-														setValue('country_id', value?.country_id || null);
-														setValue('state_id', value?.state_id || null);
-													}}
-													isOptionEqualToValue={(option, value) => option.city_id == value.city_id}
-													onBlur={onBlur}
-													value={value}
-													options={cities}
-													sx={{ width: 300 }}
-													renderInput={(params) => {
-														return (
-															<form className='tw-w-full' action="javascript:void(0)" noValidate>
-																<TextField autoComplete='off' {...params} placeholder="Please enter your city" />
-															</form>
-														)
-													}
-													}
-												/>
-												<p className='validation-msg'>{errors?.city_id?.message}
-												</p>
-											</FormControl>
-
-										)}
-									/>
-								</div>
-							</div>
 							<div className='tw-mb-3'>
 								<FormControl sx={{ width: '100%' }}>
 									<label className='primary-text-75 tw-font-medium fs14'>Password</label>
 									<OutlinedInput
-										disabled={!emailVerified}
+										sx={{ background: 'white', }}
 										type={showPassword ? 'text' : 'password'}
 										endAdornment={
-											<InputAdornment position="end">
+											< InputAdornment position="end" >
 												<IconButton
 													aria-label="toggle password visibility"
 													onClick={() => { setShowPassword(!showPassword) }}
@@ -561,20 +372,14 @@ const TellUsMorePage = ({ updateActiveStep, currentActiveStep, onboardingUserDet
 									</p>
 								</FormControl>
 							</div>
-							
+
 							<button className='btn btn--blue tw-font-bold tw-my-4 tw-w-full'>
 								Continue
 							</button>
-							<NavLink to="/login" className='tw-font-medium tw-underline primary-text-1 tw-flex tw-items-center tw-justify-center '>
-								Login
-							</NavLink>
-
-
 						</div>
-
 					</div>
-				</div>
-			</form>
+				</div >
+			</form >
 
 		</>
 	);

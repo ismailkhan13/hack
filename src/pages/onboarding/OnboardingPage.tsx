@@ -10,8 +10,6 @@ import { httpService, IAPIResponse, MODULES_API_MAP } from '../../httpService';
 import { getDataFromLocalStorage, setDataOnLocalStorage } from '../../utils/globalUtilities';
 import { GLOBAL_API_ROUTES } from '../../globalApiRoutes';
 import TellUsMorePage from './tell-us-more/tellUsMore';
-import CompleteYourSignUpPage from './complete-your-signup/completeYourSignup';
-import OneLastStepPage from './one-last-step/one-last-step';
 
 const OnboardingPage = () => {
 
@@ -144,18 +142,6 @@ const OnboardingPage = () => {
 				/>
 				: null}
 			{/* step - 2 - onboarding choice page */}
-			{activeStep === 2 ?
-				<CompleteYourSignUpPage
-					updateActiveStep={updateActiveStep}
-					currentActiveStep={activeStep}
-					onboardingUserDetails={onboardingUserData!}
-				/> : null}
-			{/* step - 3 - onboarding interest page */}
-			{activeStep === 3 ? <OneLastStepPage
-				updateActiveStep={updateActiveStep}
-				currentActiveStep={activeStep}
-				onboardingUserDetails={onboardingUserData!}
-			/> : null}
 
 			{/* step - 4 - onboarding welcome page */}
 			{/* {activeStep === 4 ? <WelcomeToMindlerPage onboardingUserDetails={onboardingUserData!} /> : null} */}

@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 // import Tooltip from '@mui/material/Tooltip';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Modal } from '@mui/material';
+import { Modal, TextField } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { Tooltip } from "react-tooltip";
 import 'react-tooltip/dist/react-tooltip.css';
@@ -18,6 +18,7 @@ import { Box } from '@mui/system';
 import { toast } from 'react-toastify';
 import { getQuestion, saveAnswer } from '../../../services/AssessmentService';
 import { IGetQuestionRes } from '../../../types/assessment-interface';
+import { useNavigate } from 'react-router-dom';
 
 const imageBaseUrl = process.env.REACT_APP_MINDLER_PRODUCT_IMAGES_URL;
 
@@ -47,6 +48,11 @@ const TestSection = (props: IProps) => {
 
     const [isLastQuestion, setIsLastQuestion] = useState(false);
 
+    const [testimonialText, setTestimonialText] = useState('')
+
+    const navigate=useNavigate()
+
+
 
     const modalStyle = {
         position: 'absolute' as 'absolute',
@@ -68,9 +74,9 @@ const TestSection = (props: IProps) => {
     */
     const fetchNextQuestion = async (lastQuestion = false) => {
         let questionResponse: IGetQuestionRes = await getQuestion(lastQuestion)
-        .catch((err) => {
-            toast.error('Error Fetching Question, Please Try Later');
-        })
+            .catch((err) => {
+                toast.error('Error Fetching Question, Please Try Later');
+            })
         disableSelection.current = false; //allow user to select any option
         if (questionResponse?.button_name === "SUBMIT") {
             setIsLastQuestion(true);
@@ -96,6 +102,8 @@ const TestSection = (props: IProps) => {
             setShowAlertOnLastSubmit(true);
         }
     }
+
+    
 
     const submitAnswer = async (option_id: number) => {
         await saveAnswer({ questionId: questionDetails?.question.id || 0, optionId: option_id })
@@ -124,7 +132,8 @@ const TestSection = (props: IProps) => {
     }
 
     return (
-        <section className='test-section tw-p-2 md:tw-px-16 md:tw-pb-16 md:pt-6'>
+        <section className='test-section tw-bg-[#1E1E1E] tw-rounded-[24px] tw-p-2 md:tw-px-16 md:tw-pb-16 md:pt-6'>
+            <p className='section-heading'>Assessment</p>
             <div className='question tw-flex tw-items-center tw-gap-4 fs14 tw-font-semibold'>Question {getQuestionNumber()}/{questionDetails?.totalQuestion || 0}
                 {
                     questionDetails?.question?.additional_info ? (
@@ -142,8 +151,6 @@ const TestSection = (props: IProps) => {
             </div>
             <div className='tw-flex tw-items-center tw-justify-between '>
                 <div className='text tw-font-bold' dangerouslySetInnerHTML={{ __html: purify.sanitize(questionDetails?.question?.question || "") }}></div>
-
-
             </div>
             {questionDetails?.question?.question_image &&
                 <img
@@ -156,7 +163,7 @@ const TestSection = (props: IProps) => {
                     ({ values, handleChange, setFieldValue }) => {
                         return (
                             <Form>
-                                {questionDetails?.option?.map((option, idx) => (
+                                {questionDetails?.option ? questionDetails?.option?.map((option, idx) => (
                                     <div key={option.id} className='tw-my-4'>
                                         {option.option_image ?
                                             <div className='tw-flex'>
@@ -176,8 +183,24 @@ const TestSection = (props: IProps) => {
                                                 </label>
                                             </div>
                                         }
+
                                     </div>
-                                ))}
+                                )) :
+                                    <div className='tw-flex tw-flex-col tw-gap-2'>
+                                        <TextField
+                                            className='tw-bg-white tw-w-1/2'
+                                            placeholder='Enter your text message'
+                                            margin="normal"
+                                            variant="outlined"
+                                            value={testimonialText}
+                                            onChange={(event) => setTestimonialText(event.target.value)}
+                                            multiline
+                                            rows={2}
+                                        />
+                                        <button className='btn btn--blue tw-w-max'>Submit</button>
+
+                                    </div>
+                                }
                             </Form>
                         )
                     }
@@ -187,7 +210,7 @@ const TestSection = (props: IProps) => {
             {
                 questionDetails?.answeredQuestion != 0 && !isPrevQuestion ?
                     <div className='tw-flex tw-justify-center tw-mt-20'>
-                        <button onClick={goToLastQuestion} className=''><ArrowBackIcon /> Back</button>
+                        <button onClick={goToLastQuestion} className='btn btn--sky'><ArrowBackIcon fontSize='small' /> Back</button>
                     </div>
                     : null
             }
@@ -207,10 +230,10 @@ const TestSection = (props: IProps) => {
                         If you wish to change your last answer, please go back, else submit.
                     </div>
                     <div className="tw-flex tw-justify-center tw-gap-2">
-                        <button onClick={() => { disableSelection.current=false; setIsPrevQuestion(true); setShowAlertOnLastSubmit(false) }} className='button1 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
+                        <button onClick={() => { disableSelection.current = false; setIsPrevQuestion(true); setShowAlertOnLastSubmit(false) }} className='button1 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
                             <div className='button-pe tw-font-medium'>Go Back</div>
                         </button>
-                        <button onClick={() => { submitAnswer(selectedOption.option_id) }} className='button2 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
+                        <button onClick={() => { navigate('/thankyou')}} className='button2 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
                             <div className='res tw-font-bold'>Submit</div>
                         </button>
                     </div>

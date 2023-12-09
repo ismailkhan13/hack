@@ -1,15 +1,30 @@
 @import "/src/assets/styles/abstracts/variables";
-.theme-toast{
+
+.theme-toast {
     @extend .primary-background;
     @extend .primary-text-1;
     @extend .primary-border;
 }
 
-.react-tel-input .form-control{
+.react-tel-input .form-control {
     @extend .primary-background;
 }
 
-.pwa-update-screen{
+.pwa-update-screen {
     padding: 3rem;
     text-align: center;
+}
+
+.App {
+    background-color: #1E1E1E;
+    border-radius: 30px;
+    margin: 2rem ;
+    min-height: 100vh;
+    // padding: 1rem 6rem;
+    color: #fff;
+
+    @include respond(phone) {
+        padding: 1rem;
+        margin: 0px;
+    }
 }
