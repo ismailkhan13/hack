@@ -2,4 +2,17 @@
     .wrapper {
         min-height: 100vh;
     }
+
+    .survey-heading {
+        background-clip: text;
+    }
+
+    .survey-logo-container {
+        width: 70px;
+        border-radius: 20px;
+
+        .logo {
+            border-radius: 20px;
+        }
+    }
 }
