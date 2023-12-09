@@ -1,0 +1,17 @@
+.survey-card {
+    background: #fff;
+    border: 1px solid rgba(17, 13, 63, .08);
+    border-radius: 16px;
+    box-shadow: 0 14px 50px -20px rgba(8, 17, 49, .07);
+    height: 197px;
+    padding: 1rem;
+    min-width: 270px;
+    position: relative;
+
+    .survey-heading {
+        color: #0a2c3f;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+}

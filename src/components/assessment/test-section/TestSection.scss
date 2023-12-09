@@ -36,6 +36,7 @@
 
     .option {
         background-color: #fff;
+        border: 1px solid rgba(17,13,63,.08);
 
         .tick {
             display: none;
@@ -86,7 +87,7 @@
 .pause-exit-popup {
     border-radius: 1rem;
     width: 50%;
-    @extend .primary-background;
+    background-color: #fff;
 
     @include respond(phone) {
         width: 90%;
