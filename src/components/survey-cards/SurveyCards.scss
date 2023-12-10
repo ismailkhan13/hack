@@ -3,11 +3,24 @@
     border: 1px solid rgba(17, 13, 63, .08);
     border-radius: 16px;
     box-shadow: 0 14px 50px -20px rgba(8, 17, 49, .07);
-    height: 197px;
+    // height: 197px;
     padding: 1rem;
     min-width: 270px;
     position: relative;
     border: 1px solid #444444;
+
+    .thumbnail-container {
+        width: 370px;
+        margin: 0 auto;
+        border-radius: 16px;
+        margin-top: 1rem;
+        img {
+            border-radius: 16px;
+
+            width: 100%;
+        }
+    }
+
 
     .survey-heading {
         color: #fff;

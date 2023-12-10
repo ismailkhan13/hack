@@ -20,9 +20,9 @@ const Thankyou = () => {
                     Thank you for completing your Survey
                 </h1>
 
-                {/* <Link to={'/'} className="btn btn--blue bt-xl book-session">
-                    Home
-                </Link> */}
+                <Link to={'/surveys'} className="btn btn--blue bt-xl book-session">
+                    Go back to All Surveys
+                </Link> 
             </div>
         </div>
     )

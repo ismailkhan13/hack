@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import TestSection from '../../components/assessment/test-section/TestSection';
 import OnboardingPage from '../onboarding/OnboardingPage';
+
 
 const Assessment = () => {
 
 	const [modalVis, setModalVis] = useState(false);
 
+	const navigate = useNavigate()
 	const onFinishHandler = () => {
-		console.log("Finished Test")		
+		navigate('/thankyou')
 	}
 
 	const setModalVisibility = (x: boolean) => {

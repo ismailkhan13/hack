@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import "./TestSection.scss";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,7 +18,12 @@ import { Box } from '@mui/system';
 import { toast } from 'react-toastify';
 import { getQuestion, saveAnswer } from '../../../services/AssessmentService';
 import { IGetQuestionRes } from '../../../types/assessment-interface';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from "axios";
+import { getDataFromLocalStorage, setDataOnLocalStorage } from '../../../utils/globalUtilities';
+import { getSurveyDetails, getSurveyQuestions } from '../../../services/SurveryList';
+import { LOCAL_STORAGE_DATA_KEYS } from '../../../localstorageDataModel';
+import { UserContext } from '../../../App';
 
 const imageBaseUrl = process.env.REACT_APP_MINDLER_PRODUCT_IMAGES_URL;
 
@@ -35,9 +40,8 @@ const TestSection = (props: IProps) => {
         option_id: 0
     }
 
-    const [questionDetails, setQuestionDetails] = useState<IGetQuestionRes>()
 
-    const [selectedOption, setSelectedOption] = useState<{ option_id: number }>(initialFormValue);
+    const [selectedOption, setSelectedOption] = useState<{ option_id: number | null }>(initialFormValue);
 
     // const [disableSubmit, setDisableSubmit] = useState(false);
     const disableSelection = useRef(false);
@@ -48,10 +52,29 @@ const TestSection = (props: IProps) => {
 
     const [isLastQuestion, setIsLastQuestion] = useState(false);
 
-    const [testimonialText, setTestimonialText] = useState('')
+    const navigate = useNavigate()
 
-    const navigate=useNavigate()
+    const [questionIdx, setQuestionIdx] = useState<number>(-1);
 
+    const [inputtext, setInputtext] = useState<string>("");
+
+    const [userInput, setUserInput] = useState<any[]>([]);
+
+    let { surveyId } = useParams();
+
+    const [surveyDetails, setSurveyDetails] = useState<any>();
+
+    const [questions, setQuestions] = useState<({
+        id: number;
+        question: string;
+        type: string;
+        options?: {
+            option_id: number;
+            value: string;
+            name: string;
+        }[];
+        script: string;
+    })[]>([]);
 
 
     const modalStyle = {
@@ -65,155 +88,217 @@ const TestSection = (props: IProps) => {
         p: 4,
     };
 
+    const userDetails = useContext(UserContext);
+
+
     useEffect(() => {
-        fetchNextQuestion();
+        setSurveyDetails(getSurveyDetails(surveyId));
+        resumeSurvey();
     }, [])
 
     /*
         Fetch Next Question from API 
     */
-    const fetchNextQuestion = async (lastQuestion = false) => {
-        let questionResponse: IGetQuestionRes = await getQuestion(lastQuestion)
-            .catch((err) => {
-                toast.error('Error Fetching Question, Please Try Later');
-            })
+    const fetchNextQuestion = async (isAlreadyset: boolean = false) => {
+        setInputtext("");
+        if (!questions?.length) {
+            let questionResponse = getSurveyQuestions(surveyId);
+            setQuestions(questionResponse);
+            if (!isAlreadyset) {
+                setQuestionIdx(0);
+            }
+        } else {
+
+            if (isLastQuestion) {
+                if (!isAlreadyset) {
+
+                    setQuestionIdx(0);
+                }
+            }
+            if (!isAlreadyset) {
+
+                setQuestionIdx((p) => p + 1);
+            }
+        }
         disableSelection.current = false; //allow user to select any option
-        if (questionResponse?.button_name === "SUBMIT") {
+        if (questionIdx != -1 && questions?.length == questionIdx + 1) {
             setIsLastQuestion(true);
+            props.onFinishHandler();
+            let cs: any[] = JSON.parse(getDataFromLocalStorage('comp') || "[]");
+            cs.push(surveyId)
+            setDataOnLocalStorage('comp', JSON.stringify(cs));
+            return;
         } else {
             setIsLastQuestion(false);
         }
-        setQuestionDetails(questionResponse);
-        if (lastQuestion) {
-            patchSelectedOption(questionResponse);
-            setIsPrevQuestion(true);
-        } else {
-            setIsPrevQuestion(false) //To reset previous question flag if not a last question
-        }
+
     }
 
-    const handleOptionSelect = (event: React.SyntheticEvent, option_id: number) => {
+    const handleOptionSelect = (event: React.SyntheticEvent, option_id: number | null, type: string) => {
         if (disableSelection.current) { return }
         disableSelection.current = true; //prevent user to select other option while submitting
         setSelectedOption({ option_id });
-        if (!isLastQuestion) {
-            submitAnswer(option_id);
-        } else {
-            setShowAlertOnLastSubmit(true);
+        let answer: any = option_id;
+        if (type == 'text' || type == 'textarea') {
+            answer = inputtext;
+        } else if (type == 'checkbox') {
+            answer = JSON.stringify(userInput);
         }
+        if (!isLastQuestion) {
+            submitAnswer(answer, questions[questionIdx].id);
+        }
+        // else {
+        //     setShowAlertOnLastSubmit(true);
+        // }
     }
 
-    
+    const submitAnswer = async (option_id: any, question_id: number) => {
+        if (!await validateResponse(option_id)) {
+            setDataOnLocalStorage(`nrd_${surveyId}`, '1');
+        }
+        let list: any[] = JSON.parse(getDataFromLocalStorage(LOCAL_STORAGE_DATA_KEYS.CSR + `_${surveyId}`) || "[]") || [];
+        list.push({
+            option_id,
+            question_id
+        })
+        setDataOnLocalStorage(LOCAL_STORAGE_DATA_KEYS.CSR + `_${surveyId}`, JSON.stringify(list));
 
-    const submitAnswer = async (option_id: number) => {
-        await saveAnswer({ questionId: questionDetails?.question.id || 0, optionId: option_id })
-            .catch((err) => {
-                if (err.response.data?.errors && err?.response.data?.errors[0]?.message)
-                    toast.error(err?.response.data?.errors[0]?.message);
-                props.onFinishHandler();
-            })
         if (!isLastQuestion) {
             fetchNextQuestion();
-        } else {
-            props.onFinishHandler();
         }
-    }
-
-    const goToLastQuestion = () => {
-        fetchNextQuestion(true);
     }
 
     const getQuestionNumber = () => {
-        return (isPrevQuestion && !isLastQuestion) ? (questionDetails?.answeredQuestion! || 0) : (questionDetails?.answeredQuestion! + 1 || 0)
+        return questionIdx + 1;
     }
 
-    const patchSelectedOption = (questionResponse: IGetQuestionRes) => {
-        setSelectedOption({ option_id: questionResponse.selectedOption || 0 });
+    const validateResponse = async (answer: any) => {
+        try {
+            let isValid = await axios.post<{ data: boolean }>(`https://surveyx-api.onrender.com/validate_question`, {
+                "setId": +surveyId!,
+                "questionId": questions && questions[questionIdx].id,
+                "answer": answer
+            })
+            return isValid.data.data;
+        } catch (err) {
+            console.log(err);
+            return 0;
+        }
+
     }
+
+    const onCbSelect = (event: any, id: number, data: any) => {
+        if (event.target.checked) {
+            setUserInput((cb) => {
+                let new_cb = [...cb];
+                new_cb.push(data);
+                return new_cb;
+            })
+        } else {
+            setUserInput((cb) => {
+                let idx = cb.findIndex((selected) => selected.id == id)
+                let new_cb = [...cb];
+                new_cb.splice(idx, 1);
+                return new_cb;
+            })
+        }
+    }
+
+    const resumeSurvey = async () => {
+        if (surveyId && !isNaN(+surveyId) && +surveyId == 1) {
+            await axios.post('https://surveyx-api.onrender.com/recentTransactions', {
+                "account_id": userDetails?.userDetails?.address
+            })
+            .catch((err)=>{
+                
+            })
+        }
+        let list: any[] = JSON.parse(getDataFromLocalStorage(LOCAL_STORAGE_DATA_KEYS.CSR + `_${surveyId}`) || "[]") || [];
+        setQuestionIdx(list?.length || 0);
+        fetchNextQuestion(!!list?.length);
+    }
+
 
     return (
         <section className='test-section tw-bg-[#1E1E1E] tw-rounded-[24px] tw-p-2 md:tw-px-16 md:tw-pb-16 md:pt-6'>
-            <p className='section-heading'>Assessment</p>
-            <div className='question tw-flex tw-items-center tw-gap-4 fs14 tw-font-semibold'>Question {getQuestionNumber()}/{questionDetails?.totalQuestion || 0}
-                {
-                    questionDetails?.question?.additional_info ? (
-                        <span className='tw-ml-2'>
-                            <button data-tooltip-id="add-info">
-                                <InfoIcon />
-                            </button>
-                            <Tooltip positionStrategy='fixed' className='tw-max-w-xs tw-text-center' html={questionDetails?.question?.additional_info || ""} id="add-info" place="top" >
-                                {/* <div className='tw-text-white tw-font-medium fs14' dangerouslySetInnerHTML={{ __html: questionDetails?.question?.additional_info || "" }}></div> */}
-                            </Tooltip>
-
-                        </span>
-                    ) : ''
-                }
+            <p className='section-heading'>Survey - {surveyDetails?.title}</p>
+            <div className='question tw-flex tw-items-center tw-gap-4 fs14 tw-font-semibold'>Question {getQuestionNumber()}/{questions?.length || 0}
             </div>
             <div className='tw-flex tw-items-center tw-justify-between '>
-                <div className='text tw-font-bold' dangerouslySetInnerHTML={{ __html: purify.sanitize(questionDetails?.question?.question || "") }}></div>
+                <div className='text tw-font-bold'>
+                    {questions && questions[questionIdx]?.question}
+                </div>
             </div>
-            {questionDetails?.question?.question_image &&
-                <img
-                    className={`question-image${(questionDetails.question.id === 266 || questionDetails.question.id === 267) ? '--big' : ''}`} //hardcoding for some question images which need big size
-                    src={`${imageBaseUrl}/assessment/question_images/${questionDetails?.question?.question_image}`} alt=""
-                />}
 
-            <Formik initialValues={selectedOption} onSubmit={(values) => { console.log(values); }}>
+
+            <div className='tw-my-4'>
                 {
-                    ({ values, handleChange, setFieldValue }) => {
-                        return (
-                            <Form>
-                                {questionDetails?.option ? questionDetails?.option?.map((option, idx) => (
-                                    <div key={option.id} className='tw-my-4'>
-                                        {option.option_image ?
-                                            <div className='tw-flex'>
-                                                <input className='big-radio tw-mr-2' id={`option-${idx}`} disabled={disableSelection.current} name='option_id' onClick={(e) => { handleOptionSelect(e, option.id); setFieldValue("option_id", option.id) }} checked={option.id === selectedOption.option_id} value={option.id} type="radio" />
-                                                <label htmlFor={`option-${idx}`} className='option option__img'>
-                                                    <img className='tw-w-full' src={`${imageBaseUrl}/assessment/option_images/${option.option_image}`} alt={`option-img-${idx}`} />
-                                                </label>
-                                            </div>
-                                            :
-                                            <div className=''>
-                                                <input id={`option-${idx}`} disabled={disableSelection.current} className='option-radio' name='option_id' onClick={(e) => { handleOptionSelect(e, option.id); setFieldValue("option_id", option.id) }} checked={option.id === selectedOption.option_id} value={option.id} type="radio" />
-                                                <label htmlFor={`option-${idx}`} className='option  tw-font-medium'>
-                                                    <span dangerouslySetInnerHTML={{ __html: purify.sanitize(option.option || "") }}></span>
-                                                    <div className='tick'>
-                                                        <img src={`${imageBaseUrl}/assessment/tick.svg`} alt="" />
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        }
-
-                                    </div>
-                                )) :
-                                    <div className='tw-flex tw-flex-col tw-gap-2'>
-                                        <TextField
-                                            className='tw-bg-white tw-w-1/2'
-                                            placeholder='Enter your text message'
-                                            margin="normal"
-                                            variant="outlined"
-                                            value={testimonialText}
-                                            onChange={(event) => setTestimonialText(event.target.value)}
-                                            multiline
-                                            rows={2}
-                                        />
-                                        <button className='btn btn--blue tw-w-max'>Submit</button>
-
-                                    </div>
-                                }
-                            </Form>
-                        )
-                    }
+                    questions && questions[questionIdx]?.type == 'checkbox' &&
+                    <>
+                        {
+                            questions[questionIdx]?.options?.map((option, index) => (
+                                <div key={index} className='tw-flex tw-items-center tw'>
+                                    <label htmlFor={`option-${option.option_id}`} className='option tw-font-medium'>
+                                        <input type="checkbox" className='tw-mr-4' id={`option-${option.option_id}`} name={option.value} onChange={(e) => { onCbSelect(e, option.option_id, { ...option }) }} />
+                                        <span>{option.value} - {option.name}</span>
+                                    </label>
+                                </div>
+                            ))
+                        }
+                        <button type='button' onClick={(e) => { handleOptionSelect(e, null, questions[questionIdx]?.type); }} className='btn btn--blue tw-w-max'>Submit</button>
+                    </>
                 }
-            </Formik>
 
-            {
+
+                {
+                    questions && (questions[questionIdx]?.type == 'radio' || questions[questionIdx]?.type == 'dropdown') &&
+                    <div>
+                        {
+                            questions[questionIdx]?.options?.map((op) => (
+                                <div key={op.option_id} className='tw-block tw-my-4'>
+                                    <input id={`option-${op.option_id}`} disabled={disableSelection.current} className='option-radio' name='option_id' onClick={(e) => { handleOptionSelect(e, op.option_id, questions[questionIdx]?.type); }} checked={op.option_id === selectedOption.option_id} value={op.option_id} type="radio" />
+                                    <label htmlFor={`option-${op.option_id}`} className='option  tw-font-medium'>
+                                        <span>{op.value} - {op.name}</span>
+                                        <div className='tick'>
+                                            <img src={`${imageBaseUrl}/assessment/tick.svg`} alt="" />
+                                        </div>
+                                    </label>
+                                </div>
+                            ))
+                        }
+                    </div>
+                }
+
+
+                {
+                    questions && (questions[questionIdx]?.type == 'textarea' || questions[questionIdx]?.type == 'text') &&
+                    <>
+                        <div className='tw-flex tw-flex-col tw-gap-2'>
+                            <TextField
+                                className='tw-bg-white tw-w-1/2'
+                                placeholder='Enter your response'
+                                margin="normal"
+                                variant="outlined"
+                                value={inputtext}
+                                onChange={(event) => setInputtext(event.target.value)}
+                                multiline
+                                rows={2}
+                            />
+                            <button type='button' onClick={(e) => { handleOptionSelect(e, null, questions[questionIdx]?.type); }} className='btn btn--blue tw-w-max'>Submit</button>
+
+                        </div>
+                    </>
+                }
+
+            </div>
+
+            {/* {
                 questionDetails?.answeredQuestion != 0 && !isPrevQuestion ?
                     <div className='tw-flex tw-justify-center tw-mt-20'>
                         <button onClick={goToLastQuestion} className='btn btn--sky'><ArrowBackIcon fontSize='small' /> Back</button>
                     </div>
                     : null
-            }
+            } */}
 
             {/* popup*/}
             <Modal
@@ -233,7 +318,7 @@ const TestSection = (props: IProps) => {
                         <button onClick={() => { disableSelection.current = false; setIsPrevQuestion(true); setShowAlertOnLastSubmit(false) }} className='button1 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
                             <div className='button-pe tw-font-medium'>Go Back</div>
                         </button>
-                        <button onClick={() => { navigate('/thankyou')}} className='button2 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
+                        <button onClick={() => { navigate('/thankyou') }} className='button2 tw-flex tw-justify-center tw-items-center tw-cursor-pointer'>
                             <div className='res tw-font-bold'>Submit</div>
                         </button>
                     </div>

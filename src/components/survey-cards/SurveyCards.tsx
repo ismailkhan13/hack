@@ -1,11 +1,22 @@
 import React from 'react'
 import "./SurveyCards.scss"
-const SurveyCards = () => {
+import { Link } from 'react-router-dom';
+import thumbnail from "../../assets/images/thumbnail.jpeg"
+const SurveyCards = (props: any) => {
     return (
         <div className='survey-card'>
-            <p className='survey-heading'>Heading</p>
-            <p className='survey-content tw-font-light'>Explore the world of careers with detailed information on each career domain</p>
-            <button className='btn btn--blue tw-absolute tw-bottom-4 tw-left-4'>Know More</button>
+            <div>
+                <div>
+                    <p className='survey-heading'>{props.title}</p>
+                    <p className='survey-content tw-font-light'>{props.description}</p>
+                </div>
+                <div className='thumbnail-container'>
+                    <img src={'/thumbnail.jpeg'}/> 
+                </div>
+            </div>
+
+
+            <Link to={`/survey/${props.set}`} className='btn btn--blue tw-bottom-4 tw-left-4'>Take Survey</Link>
         </div>
     )
 }
